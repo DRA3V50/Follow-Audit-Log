@@ -4,15 +4,20 @@ import os
 from datetime import datetime
 
 # --- CONFIGURATION ---
-USERNAME = "DRA3V50"                        # Your GitHub username
-FOLLOWERS_FILE = "followers.json"           # Stores last snapshot of followers
-LOG_FILE = "log.json"                        # Stores history of follower changes
+USERNAME = "DRA3V50"  # Your GitHub username
+FOLLOWERS_FILE = "followers.json"
+LOG_FILE = "log.json"
 GITHUB_TOKEN = os.environ.get("GH_FOLLOW_TOKEN")  # PAT from GitHub Secrets
-HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"}  # Auth header
+
+# Include Accept header to avoid API issues
+HEADERS = {
+    "Authorization": f"token {GITHUB_TOKEN}",
+    "Accept": "application/vnd.github+json"
+}
 
 # --- FUNCTIONS ---
 def get_followers():
-    """Fetch all followers of USERNAME (paginated)"""
+    """Fetch all followers (paginated)"""
     followers = []
     page = 1
     per_page = 100
@@ -20,7 +25,7 @@ def get_followers():
         url = f"https://api.github.com/users/{USERNAME}/followers?per_page={per_page}&page={page}"
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
-        batch = [user["login"] for user in response.json()]
+        batch = [u["login"] for u in response.json()]
         if not batch:
             break
         followers.extend(batch)
@@ -28,7 +33,7 @@ def get_followers():
     return followers
 
 def get_following():
-    """Fetch all users you are currently following (paginated)"""
+    """Fetch all users you are following (paginated)"""
     following = []
     page = 1
     per_page = 100
@@ -36,7 +41,7 @@ def get_following():
         url = f"https://api.github.com/user/following?per_page={per_page}&page={page}"
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
-        batch = [user["login"] for user in response.json()]
+        batch = [u["login"] for u in response.json()]
         if not batch:
             break
         following.extend(batch)
@@ -44,7 +49,7 @@ def get_following():
     return following
 
 def load_previous():
-    """Load previous follower snapshot"""
+    """Load previous followers from JSON"""
     if not os.path.exists(FOLLOWERS_FILE):
         return []
     try:
@@ -53,13 +58,14 @@ def load_previous():
     except (json.JSONDecodeError, FileNotFoundError):
         return []
 
-def save_followers(followers):
-    """Save current follower snapshot"""
-    with open(FOLLOWERS_FILE, "w") as f:
-        json.dump(followers, f, indent=2)
+def save_json(filename, data):
+    """Save JSON safely with flush"""
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=2)
+        f.flush()
 
 def log_changes(unfollowed, new_followers, followed_back):
-    """Log changes with timestamps"""
+    """Log all changes with timestamp"""
     log_entry = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "unfollowed": unfollowed,
@@ -68,20 +74,18 @@ def log_changes(unfollowed, new_followers, followed_back):
     }
 
     if os.path.exists(LOG_FILE):
-        with open(LOG_FILE, "r") as f:
-            try:
+        try:
+            with open(LOG_FILE, "r") as f:
                 data = json.load(f)
-            except json.JSONDecodeError:
-                data = []
+        except json.JSONDecodeError:
+            data = []
     else:
         data = []
 
     data.append(log_entry)
-    with open(LOG_FILE, "w") as f:
-        json.dump(data, f, indent=2)
+    save_json(LOG_FILE, data)
 
 def auto_unfollow(users):
-    """Unfollow users who unfollowed you"""
     for user in users:
         response = requests.delete(f"https://api.github.com/user/following/{user}", headers=HEADERS)
         if response.status_code == 204:
@@ -90,7 +94,6 @@ def auto_unfollow(users):
             print(f"Failed to unfollow {user}: {response.status_code}")
 
 def auto_follow(users):
-    """Follow users who aren’t followed back"""
     for user in users:
         response = requests.put(f"https://api.github.com/user/following/{user}", headers=HEADERS)
         if response.status_code == 204:
@@ -100,18 +103,18 @@ def auto_follow(users):
 
 # --- MAIN EXECUTION ---
 def main():
-    current_followers = get_followers()       # Get current followers
-    current_following = get_following()       # Get current following
-    previous = load_previous()                # Load previous snapshot
+    current_followers = get_followers()
+    current_following = get_following()
+    previous_followers = load_previous()
 
-    # Detect unfollowers (were following before, now missing)
-    unfollowed = [user for user in previous if user not in current_followers and user in current_following]
+    # Detect unfollowers you still follow
+    unfollowed = [u for u in previous_followers if u not in current_followers and u in current_following]
 
     # Detect new followers
-    new_followers = [user for user in current_followers if user not in previous]
+    new_followers = [u for u in current_followers if u not in previous_followers]
 
     # Detect missing follow-backs
-    missing_follow_back = [user for user in current_followers if user not in current_following]
+    missing_follow_back = [u for u in current_followers if u not in current_following]
 
     # Take actions
     if unfollowed or new_followers or missing_follow_back:
@@ -124,7 +127,7 @@ def main():
     else:
         print("No changes detected.")
 
-    save_followers(current_followers)  # Update snapshot
+    save_json(FOLLOWERS_FILE, current_followers)
 
 if __name__ == "__main__":
     main()
