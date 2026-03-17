@@ -4,9 +4,9 @@ import os
 from datetime import datetime
 
 # --- CONFIGURATION ---
-USERNAME = "DRA3V50"  # Your GitHub username
-FOLLOWERS_FILE = "followers.json"
-LOG_FILE = "log.json"
+USERNAME = "DRA3V50"                       # Your GitHub username
+FOLLOWERS_FILE = "followers.json"          # File storing last snapshot of followers
+LOG_FILE = "log.json"                      # File storing history of changes
 GITHUB_TOKEN = os.environ.get("GH_FOLLOW_TOKEN")  # PAT from GitHub Secrets
 
 HEADERS = {
@@ -32,7 +32,7 @@ def get_followers():
     return followers
 
 def get_following():
-    """Fetch all users you are following"""
+    """Fetch all accounts USERNAME is following, handling pagination"""
     following = []
     page = 1
     per_page = 100
@@ -48,7 +48,7 @@ def get_following():
     return following
 
 def load_previous():
-    """Load previous follower snapshot"""
+    """Load previous follower snapshot, return empty list if missing"""
     if not os.path.exists(FOLLOWERS_FILE):
         return []
     try:
@@ -58,19 +58,19 @@ def load_previous():
         return []
 
 def save_json(filename, data):
-    """Save JSON file with flush/fsync to ensure GitHub Actions detects changes"""
+    """Save JSON safely and flush to disk"""
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
         f.flush()
         os.fsync(f.fileno())
 
-def log_changes(unfollowed, new_followers, followed_back):
-    """Log follower changes with timestamp to log.json"""
+def log_changes(unfollowed, new_followers, follow_back):
+    """Log all changes with timestamp to log.json"""
     log_entry = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "unfollowed": unfollowed,
         "new_followers": new_followers,
-        "followed_back": followed_back
+        "followed_back": follow_back
     }
 
     if os.path.exists(LOG_FILE):
@@ -86,7 +86,7 @@ def log_changes(unfollowed, new_followers, followed_back):
     save_json(LOG_FILE, data)
 
 def auto_unfollow(users):
-    """Automatically unfollow users who unfollowed you"""
+    """Automatically unfollow users"""
     for user in users:
         response = requests.delete(f"https://api.github.com/user/following/{user}", headers=HEADERS)
         if response.status_code == 204:
@@ -95,13 +95,16 @@ def auto_unfollow(users):
             print(f"Failed to unfollow {user}: {response.status_code}")
 
 def auto_follow(users):
-    """Automatically follow users who followed you but you don't follow yet"""
+    """Automatically follow back users"""
+    followed = []
     for user in users:
         response = requests.put(f"https://api.github.com/user/following/{user}", headers=HEADERS)
         if response.status_code == 204:
             print(f"Followed {user} successfully.")
+            followed.append(user)
         else:
             print(f"Failed to follow {user}: {response.status_code}")
+    return followed
 
 # --- MAIN EXECUTION ---
 def main():
@@ -109,23 +112,24 @@ def main():
     current_following = get_following()
     previous_followers = load_previous()
 
-    # Unfollow anyone who unfollowed you but you still follow
+    # Users who unfollowed but you still follow
     unfollowed = [u for u in previous_followers if u not in current_followers and u in current_following]
 
-    # Detect new followers since last snapshot
+    # New followers since last snapshot
     new_followers = [u for u in current_followers if u not in previous_followers]
 
-    # Detect missing follow-backs
+    # Followers you haven't followed back yet
     missing_follow_back = [u for u in current_followers if u not in current_following]
 
-    # Log all changes
-    log_changes(unfollowed, new_followers, missing_follow_back)
+    # Follow back users and capture who succeeded
+    followed_back = auto_follow(missing_follow_back) if missing_follow_back else []
 
-    # Take actions
+    # Unfollow users who unfollowed
     if unfollowed:
         auto_unfollow(unfollowed)
-    if missing_follow_back:
-        auto_follow(missing_follow_back)
+
+    # Log everything
+    log_changes(unfollowed, new_followers, followed_back)
 
     # Update followers snapshot
     save_json(FOLLOWERS_FILE, current_followers)
