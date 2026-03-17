@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: false  # ensure PAT is used for push
+          persist-credentials: false  # Use PAT instead of bot token
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -31,7 +31,7 @@ jobs:
       - name: Commit and push JSON
         run: |
           git config user.name "DRA3V50"
-          git config user.email "YOUR_EMAIL@users.noreply.github.com"
+          git config user.email "DRA3V50@users.noreply.github.com"
 
           git add followers.json log.json
           git commit -m "Update follower logs [skip ci]" || echo "No changes to commit"
