@@ -73,21 +73,32 @@ def main():
         with open(FOLLOWERS_FILE, "r") as f:
             prev_followers = json.load(f)
 
+    # Fetch latest followers and following
     current_followers = get_followers()
     current_following = get_following()
 
-    # Users you need to follow back
+    print(f"DEBUG: Current followers count: {len(current_followers)}")
+    print(f"DEBUG: Current following count: {len(current_following)}")
+
+    # Users to follow back
     missing_follow_back = [u for u in current_followers if u not in current_following]
 
-    # Users who unfollowed you
+    # Users to unfollow
     unfollowed = [u for u in prev_followers if u not in current_followers and u in current_following]
 
     if missing_follow_back:
+        print(f"Following back {len(missing_follow_back)} users...")
         auto_follow(missing_follow_back)
-    if unfollowed:
-        auto_unfollow(unfollowed)
+        # Update current_following after follow
+        current_following.extend(missing_follow_back)
 
-    # Update followers.json
+    if unfollowed:
+        print(f"Unfollowing {len(unfollowed)} users...")
+        auto_unfollow(unfollowed)
+        # Remove unfollowed from current_following
+        current_following = [u for u in current_following if u not in unfollowed]
+
+    # Update followers.json to reflect actual followers + follow-backs
     with open(FOLLOWERS_FILE, "w") as f:
         json.dump(current_followers, f, indent=2)
 
@@ -111,6 +122,8 @@ def main():
         json.dump(logs, f, indent=2)
 
     print("Auto-follow/unfollow completed.")
+    print(f"Followers.json updated: {len(current_followers)} followers")
+    print(f"Following.json synced: {len(current_following)} following (after follow/unfollow)")
 
 if __name__ == "__main__":
     main()
