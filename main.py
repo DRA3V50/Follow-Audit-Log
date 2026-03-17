@@ -1,34 +1,29 @@
 import requests
 import json
 import os
-import time
 from datetime import datetime, timezone
+import time
 
 USERNAME = "DRA3V50"
 FOLLOWERS_FILE = "followers.json"
 LOG_FILE = "log.json"
 
 PAT = os.environ.get("FOLLOW_LOG")
-
-GITHUB_API_HEADERS = {
-    "Accept": "application/vnd.github+json"
-}
-
-if PAT:
-    GITHUB_API_HEADERS["Authorization"] = f"Bearer {PAT}"
-else:
-    print("ERROR: GH_FOLLOW_TOKEN not found!")
+if not PAT:
+    print("ERROR: FOLLOW_LOG not found!")
     exit(1)
 
-# --- Helper functions ---
+HEADERS = {
+    "Accept": "application/vnd.github+json",
+    "Authorization": f"Bearer {PAT}"
+}
 
 def get_followers():
     followers = []
     page = 1
-    per_page = 100
     while True:
-        url = f"https://api.github.com/users/{USERNAME}/followers?per_page={per_page}&page={page}"
-        r = requests.get(url, headers=GITHUB_API_HEADERS)
+        url = f"https://api.github.com/users/{USERNAME}/followers?per_page=100&page={page}"
+        r = requests.get(url, headers=HEADERS)
         if r.status_code != 200:
             print("Failed to fetch followers:", r.status_code, r.text)
             break
@@ -39,23 +34,6 @@ def get_followers():
         page += 1
     return followers
 
-def get_following():
-    following = []
-    page = 1
-    per_page = 100
-    while True:
-        url = f"https://api.github.com/user/following?per_page={per_page}&page={page}"
-        r = requests.get(url, headers=GITHUB_API_HEADERS)
-        if r.status_code != 200:
-            print("Failed to fetch following:", r.status_code, r.text)
-            break
-        batch = [u["login"] for u in r.json()]
-        if not batch:
-            break
-        following.extend(batch)
-        page += 1
-    return following
-
 def load_previous():
     if not os.path.exists(FOLLOWERS_FILE):
         return []
@@ -65,66 +43,38 @@ def load_previous():
     except (json.JSONDecodeError, FileNotFoundError):
         return []
 
-def save_json(filename, data):
-    with open(filename, "w") as f:
+def save_json(file, data):
+    with open(file, "w") as f:
         json.dump(data, f, indent=2)
         f.flush()
         os.fsync(f.fileno())
 
-def log_changes(unfollowed, new_followers, missing_follow_back):
+def log_changes(prev, current):
+    unfollowed = [u for u in prev if u not in current]
+    new_followers = [u for u in current if u not in prev]
     entry = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "unfollowed": unfollowed,
-        "new_followers": new_followers,
-        "missing_follow_back": missing_follow_back
+        "new_followers": new_followers
     }
-
     if os.path.exists(LOG_FILE):
         try:
             with open(LOG_FILE, "r") as f:
-                data = json.load(f)
-        except (json.JSONDecodeError, FileNotFoundError):
-            data = []
+                logs = json.load(f)
+        except:
+            logs = []
     else:
-        data = []
-
-    data.append(entry)
-    save_json(LOG_FILE, data)
-
-def auto_unfollow(users):
-    for user in users:
-        r = requests.delete(f"https://api.github.com/user/following/{user}", headers=GITHUB_API_HEADERS)
-        print(f"Unfollowed {user}" if r.status_code == 204 else f"Failed {user}: {r.status_code} {r.text}")
-        time.sleep(1)  # prevent rate limits
-
-def auto_follow(users):
-    for user in users:
-        r = requests.put(f"https://api.github.com/user/following/{user}", headers=GITHUB_API_HEADERS)
-        print(f"Followed {user}" if r.status_code == 204 else f"Failed {user}: {r.status_code} {r.text}")
-        time.sleep(1)  # prevent rate limits
-
-# --- Main workflow ---
+        logs = []
+    logs.append(entry)
+    save_json(LOG_FILE, logs)
+    return unfollowed, new_followers
 
 def main():
-    print("PAT loaded:", bool(PAT))
-
+    prev_followers = load_previous()
     current_followers = get_followers()
-    current_following = get_following()
-    previous_followers = load_previous()
-
-    unfollowed = [u for u in previous_followers if u not in current_followers and u in current_following]
-    new_followers = [u for u in current_followers if u not in previous_followers]
-    missing_follow_back = [u for u in current_followers if u not in current_following]
-
-    log_changes(unfollowed, new_followers, missing_follow_back)
-
-    if unfollowed:
-        auto_unfollow(unfollowed)
-
-    if missing_follow_back:
-        auto_follow(missing_follow_back)
-
+    log_changes(prev_followers, current_followers)
     save_json(FOLLOWERS_FILE, current_followers)
+    print("Follower tracking complete!")
 
 if __name__ == "__main__":
     main()
