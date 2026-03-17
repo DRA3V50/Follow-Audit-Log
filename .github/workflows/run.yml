@@ -10,23 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout repository without default credentials
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
 
+      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: pip install requests
 
+      # Step 4: Run follow tracker
       - name: Run follow tracker
         run: python main.py
         env:
           GH_FOLLOW_TOKEN: ${{ secrets.GH_FOLLOW_TOKEN }}
 
-      - name: Commit updated JSON files
+      # Step 5: Commit and push updated JSON files using PAT
+      - name: Commit and push JSON
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
