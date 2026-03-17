@@ -82,9 +82,11 @@ def main():
 
     # Users to follow back
     missing_follow_back = [u for u in current_followers if u not in current_following]
-
     # Users to unfollow
     unfollowed = [u for u in prev_followers if u not in current_followers and u in current_following]
+
+    print(f"DEBUG: Missing follow-backs: {missing_follow_back}")
+    print(f"DEBUG: Users to unfollow: {unfollowed}")
 
     if missing_follow_back:
         print(f"Following back {len(missing_follow_back)} users...")
@@ -98,7 +100,7 @@ def main():
         # Remove unfollowed from current_following
         current_following = [u for u in current_following if u not in unfollowed]
 
-    # Update followers.json to reflect actual followers + follow-backs
+    # Update followers.json
     with open(FOLLOWERS_FILE, "w") as f:
         json.dump(current_followers, f, indent=2)
 
@@ -123,7 +125,7 @@ def main():
 
     print("Auto-follow/unfollow completed.")
     print(f"Followers.json updated: {len(current_followers)} followers")
-    print(f"Following.json synced: {len(current_following)} following (after follow/unfollow)")
+    print(f"Following synced: {len(current_following)} users (after follow/unfollow)")
 
 if __name__ == "__main__":
     main()
