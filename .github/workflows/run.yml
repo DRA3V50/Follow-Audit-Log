@@ -30,8 +30,12 @@ jobs:
 
       - name: Run follow tracker
         env:
-          GH_FOLLOW_TOKEN: ${{ secrets.GH_FOLLOW_TOKEN }}
+          GH_FOLLOW_TOKEN: ${{ secrets.Follow_Log }}
         run: python main.py
+
+      - name: Force SSH for git
+        run: |
+          git remote set-url origin git@github.com:DRA3V50/Follow-Audit-Log.git
 
       - name: Commit and push changes
         run: |
