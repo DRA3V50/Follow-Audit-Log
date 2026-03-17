@@ -23,7 +23,7 @@ jobs:
 
       - name: Run follow tracker
         env:
-          GH_FOLLOW_TOKEN: ${{ secrets.Follow_Log }}
+          FOLLOW_LOG: ${{ secrets.FOLLOW_LOG }}
         run: python main.py
 
       - name: Commit and push changes
