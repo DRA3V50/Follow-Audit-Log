@@ -1,6 +1,6 @@
 # Follow-Audit-Log
 
-📝 A lightweight script that tracks changes in GitHub followers by comparing snapshots over time and logging differences with timestamps. 📝
+📝 A lightweight script that tracks changes in GitHub followers by comparing snapshots over time and logging differences with timestamps.
 
 ## Purpose
 This project automates the process of monitoring follower changes on GitHub. Instead of manually checking, it records who followed or unfollowed between runs and stores that history in a structured format.
