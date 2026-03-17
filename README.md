@@ -1,6 +1,6 @@
 # 📝 Follow-Audit-Log
 
-A lightweight script that tracks GitHub followers, logs changes, and automatically unfollows anyone who no longer follows you. 📝
+A lightweight script that tracks GitHub followers, logs changes, and automatically unfollows anyone who no longer follows you.
 
 ## Purpose
 Automates follower management by recording who follows or unfollows you and taking action to unfollow anyone who has unfollowed you.
