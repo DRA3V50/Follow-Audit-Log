@@ -19,11 +19,14 @@ def get_followers():
     return [user["login"] for user in response.json()]  # Extract usernames
 
 def load_previous():
-    """Load previously saved follower list"""
+    """Load previously saved follower list, return empty list if missing/empty"""
     if not os.path.exists(FOLLOWERS_FILE):
-        return []  # First run: empty list
-    with open(FOLLOWERS_FILE, "r") as f:
-        return json.load(f)
+        return []
+    try:
+        with open(FOLLOWERS_FILE, "r") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return []
 
 def save_followers(followers):
     """Save current followers to file"""
