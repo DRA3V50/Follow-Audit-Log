@@ -3,18 +3,18 @@ name: Follow Audit Log
 on:
   schedule:
     - cron: "0 13 * * *"  # 8 AM EST daily
-  workflow_dispatch:
+  workflow_dispatch:       # Manual trigger
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository without default credentials
+      # Step 1: Checkout repo without default credentials
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: false
+          persist-credentials: false  # ensures we can push using PAT
 
       # Step 2: Set up Python
       - name: Set up Python
@@ -32,12 +32,20 @@ jobs:
         env:
           GH_FOLLOW_TOKEN: ${{ secrets.GH_FOLLOW_TOKEN }}
 
-      # Step 5: Commit and push updated JSON files using PAT
+      # Step 5: Commit and push both JSON files
       - name: Commit and push JSON
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Add both JSON files explicitly
           git add followers.json log.json
+          
+          # Commit if any changes exist
           git commit -m "Update follower logs [skip ci]" || echo "No changes to commit"
+          
+          # Set remote URL with PAT for authentication
           git remote set-url origin https://x-access-token:${{ secrets.GH_FOLLOW_TOKEN }}@github.com/DRA3V50/Follow-Audit-Log.git
+          
+          # Push changes to main branch
           git push origin HEAD:main
