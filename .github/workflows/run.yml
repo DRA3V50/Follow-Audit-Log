@@ -24,4 +24,4 @@ jobs:
       - name: Run follow tracker
         run: python main.py
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Reference your PAT secret
+          GITHUB_TOKEN: ${{ secrets.GH_FOLLOW_TOKEN }}  # Reference your PAT secret
