@@ -8,7 +8,7 @@ USERNAME = "DRA3V50"
 FOLLOWERS_FILE = "followers.json"
 LOG_FILE = "log.json"
 
-PAT = os.environ.get("GH_FOLLOW_TOKEN")
+PAT = os.environ.get("FOLLOW_LOG")
 
 GITHUB_API_HEADERS = {
     "Accept": "application/vnd.github+json"
