@@ -9,7 +9,6 @@ FOLLOWERS_FILE = "followers.json"
 LOG_FILE = "log.json"
 GITHUB_TOKEN = os.environ.get("GH_FOLLOW_TOKEN")  # PAT from GitHub Secrets
 
-# Include Accept header to avoid API issues
 HEADERS = {
     "Authorization": f"token {GITHUB_TOKEN}",
     "Accept": "application/vnd.github+json"
@@ -17,7 +16,6 @@ HEADERS = {
 
 # --- FUNCTIONS ---
 def get_followers():
-    """Fetch all followers (paginated)"""
     followers = []
     page = 1
     per_page = 100
@@ -33,7 +31,6 @@ def get_followers():
     return followers
 
 def get_following():
-    """Fetch all users you are following (paginated)"""
     following = []
     page = 1
     per_page = 100
@@ -49,7 +46,6 @@ def get_following():
     return following
 
 def load_previous():
-    """Load previous followers from JSON"""
     if not os.path.exists(FOLLOWERS_FILE):
         return []
     try:
@@ -59,13 +55,11 @@ def load_previous():
         return []
 
 def save_json(filename, data):
-    """Save JSON safely with flush"""
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
         f.flush()
 
 def log_changes(unfollowed, new_followers, followed_back):
-    """Log all changes with timestamp"""
     log_entry = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "unfollowed": unfollowed,
@@ -107,25 +101,23 @@ def main():
     current_following = get_following()
     previous_followers = load_previous()
 
-    # Detect unfollowers you still follow
+    # Unfollow anyone who unfollowed you but you still follow
     unfollowed = [u for u in previous_followers if u not in current_followers and u in current_following]
 
-    # Detect new followers
+    # Detect new followers since last snapshot
     new_followers = [u for u in current_followers if u not in previous_followers]
 
     # Detect missing follow-backs
     missing_follow_back = [u for u in current_followers if u not in current_following]
 
+    # Log all changes
+    log_changes(unfollowed, new_followers, missing_follow_back)
+
     # Take actions
-    if unfollowed or new_followers or missing_follow_back:
-        log_changes(unfollowed, new_followers, missing_follow_back)
-        if unfollowed:
-            auto_unfollow(unfollowed)
-        if missing_follow_back:
-            auto_follow(missing_follow_back)
-        print("Changes detected and processed.")
-    else:
-        print("No changes detected.")
+    if unfollowed:
+        auto_unfollow(unfollowed)
+    if missing_follow_back:
+        auto_follow(missing_follow_back)
 
     save_json(FOLLOWERS_FILE, current_followers)
 
