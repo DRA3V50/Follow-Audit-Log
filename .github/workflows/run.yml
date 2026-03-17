@@ -35,6 +35,6 @@ jobs:
           
           git add followers.json log.json
           git commit -m "Update follower logs [skip ci]" || echo "No changes"
-
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/DRA3V50/Follow-Audit-Log.git
-          git push origin HEAD:main
+          
+          # Force HTTPS push with token
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/DRA3V50/Follow-Audit-Log.git HEAD:main
