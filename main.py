@@ -58,26 +58,7 @@ def save_json(filename, data):
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
         f.flush()
-
-def log_changes(unfollowed, new_followers, followed_back):
-    log_entry = {
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "unfollowed": unfollowed,
-        "new_followers": new_followers,
-        "followed_back": followed_back
-    }
-
-    if os.path.exists(LOG_FILE):
-        try:
-            with open(LOG_FILE, "r") as f:
-                data = json.load(f)
-        except json.JSONDecodeError:
-            data = []
-    else:
-        data = []
-
-    data.append(log_entry)
-    save_json(LOG_FILE, data)
+        os.fsync(f.fileno())  # ensure file system sees the change before git add
 
 def auto_unfollow(users):
     for user in users:
