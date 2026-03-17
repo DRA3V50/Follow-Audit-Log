@@ -11,8 +11,7 @@ GITHUB_API_HEADERS = {
     "Accept": "application/vnd.github+json"
 }
 
-PAT = os.environ.get("GH_FOLLOW_TOKEN")
-
+PAT = os.environ.get("Follow_Log")
 if PAT:
     GITHUB_API_HEADERS["Authorization"] = f"token {PAT}"
 
