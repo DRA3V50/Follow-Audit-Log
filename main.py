@@ -47,24 +47,25 @@ def get_following():
         page += 1
     return following
 
-def safe_request(method, url):
-    """Retry once if GitHub returns non-204."""
+def safe_request(method, url, user):
+    """Make API request and print debug info."""
     r = method(url, headers=HEADERS)
     if r.status_code != 204:
+        print(f"DEBUG: Failed {method.__name__.upper()} {user} -> Status: {r.status_code}, Response: {r.text}")
         time.sleep(1)
         r = method(url, headers=HEADERS)
+    else:
+        print(f"DEBUG: Success {method.__name__.upper()} {user}")
     return r
 
 def auto_follow(users):
     for user in users:
-        r = safe_request(requests.put, f"https://api.github.com/user/following/{user}")
-        print(f"Followed {user}" if r.status_code == 204 else f"Failed {user}: {r.status_code}")
+        safe_request(requests.put, f"https://api.github.com/user/following/{user}", user)
         time.sleep(1)
 
 def auto_unfollow(users):
     for user in users:
-        r = safe_request(requests.delete, f"https://api.github.com/user/following/{user}")
-        print(f"Unfollowed {user}" if r.status_code == 204 else f"Failed {user}: {r.status_code}")
+        safe_request(requests.delete, f"https://api.github.com/user/following/{user}", user)
         time.sleep(1)
 
 def main():
@@ -73,31 +74,25 @@ def main():
         with open(FOLLOWERS_FILE, "r") as f:
             prev_followers = json.load(f)
 
-    # Fetch latest followers and following
     current_followers = get_followers()
     current_following = get_following()
 
-    print(f"DEBUG: Current followers count: {len(current_followers)}")
-    print(f"DEBUG: Current following count: {len(current_following)}")
+    print(f"DEBUG: Followers count: {len(current_followers)}")
+    print(f"DEBUG: Following count: {len(current_following)}")
 
     # Users to follow back
     missing_follow_back = [u for u in current_followers if u not in current_following]
-    # Users to unfollow
+    # Users who unfollowed
     unfollowed = [u for u in prev_followers if u not in current_followers and u in current_following]
 
-    print(f"DEBUG: Missing follow-backs: {missing_follow_back}")
-    print(f"DEBUG: Users to unfollow: {unfollowed}")
-
     if missing_follow_back:
-        print(f"Following back {len(missing_follow_back)} users...")
+        print(f"DEBUG: Following back {len(missing_follow_back)} users: {missing_follow_back}")
         auto_follow(missing_follow_back)
-        # Update current_following after follow
         current_following.extend(missing_follow_back)
 
     if unfollowed:
-        print(f"Unfollowing {len(unfollowed)} users...")
+        print(f"DEBUG: Unfollowing {len(unfollowed)} users: {unfollowed}")
         auto_unfollow(unfollowed)
-        # Remove unfollowed from current_following
         current_following = [u for u in current_following if u not in unfollowed]
 
     # Update followers.json
@@ -125,7 +120,7 @@ def main():
 
     print("Auto-follow/unfollow completed.")
     print(f"Followers.json updated: {len(current_followers)} followers")
-    print(f"Following synced: {len(current_following)} users (after follow/unfollow)")
+    print(f"Following list synced: {len(current_following)} following (after follow/unfollow)")
 
 if __name__ == "__main__":
     main()
