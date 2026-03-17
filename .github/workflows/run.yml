@@ -1,27 +1,43 @@
 name: Follow Audit Log
 
+# Trigger: daily at 8 AM EST, or manually
 on:
   schedule:
     - cron: "0 13 * * *"  # 8 AM EST daily
-  workflow_dispatch:       # manual trigger
+  workflow_dispatch:
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout your repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: pip install requests
 
+      # Step 4: Run the follow tracker script
       - name: Run follow tracker
         run: python main.py
         env:
-          GH_FOLLOW_TOKEN: ${{ secrets.GH_FOLLOW_TOKEN }}  # ✅ Must match your PAT secret name
+          GH_FOLLOW_TOKEN: ${{ secrets.GH_FOLLOW_TOKEN }}
+
+      # Step 5: Commit and push any updated JSON files
+      - name: Commit updated JSON files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add followers.json log.json
+          git commit -m "Update follower logs [skip ci]" || echo "No changes to commit"
+          git push
+        env:
+          GH_FOLLOW_TOKEN: ${{ secrets.GH_FOLLOW_TOKEN }}
