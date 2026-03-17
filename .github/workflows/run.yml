@@ -3,7 +3,7 @@ name: Follow Audit Log
 on:
   schedule:
     - cron: "0 13 * * *"  # 8 AM EST daily
-  workflow_dispatch:       # Manual trigger
+  workflow_dispatch:       # manual trigger
 
 jobs:
   run-script:
@@ -24,4 +24,4 @@ jobs:
       - name: Run follow tracker
         run: python main.py
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_FOLLOW_TOKEN }}  # Reference your PAT secret
+          GH_FOLLOW_TOKEN: ${{ secrets.GH_FOLLOW_TOKEN }}  # ✅ Must match your PAT secret name
