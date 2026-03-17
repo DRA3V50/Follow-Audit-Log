@@ -21,20 +21,20 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run follow tracker
+      - name: Run follower tracker
         env:
           FOLLOW_LOG: ${{ secrets.FOLLOW_LOG }}
         run: python main.py
 
-      - name: Commit and push changes
+      - name: Commit and push JSON updates
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FOLLOW_LOG: ${{ secrets.FOLLOW_LOG }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions@users.noreply.github.com"
+          git config user.name "DRA3V50"
+          git config user.email "DRA3V50@users.noreply.github.com"
           
           git add followers.json log.json
-          git commit -m "Update follower logs [skip ci]" || echo "No changes"
+          git commit -m "Update follower logs [skip ci]" || echo "No changes to commit"
           
-          # Force HTTPS push with token
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/DRA3V50/Follow-Audit-Log.git HEAD:main
+          # Use PAT to push HTTPS as yourself
+          git push https://x-access-token:${FOLLOW_LOG}@github.com/DRA3V50/Follow-Audit-Log.git HEAD:main
