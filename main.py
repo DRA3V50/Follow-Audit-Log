@@ -4,7 +4,7 @@ import os                    # For checking if files exist / environment variabl
 from datetime import datetime  # For timestamping logs
 
 # --- CONFIGURATION ---
-USERNAME = "YOUR_GITHUB_USERNAME"          # Replace with your GitHub username
+USERNAME = "DRA3V50"                       # Replace with your GitHub username
 FOLLOWERS_FILE = "followers.json"          # Stores the current follower snapshot
 LOG_FILE = "log.json"                      # Stores history of follower changes
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")  # Read token from GitHub Secrets
