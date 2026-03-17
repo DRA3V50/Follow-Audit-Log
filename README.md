@@ -18,3 +18,10 @@ Runs daily via GitHub Actions at 8 AM EST or manually via workflow_dispatch.
 - `main.py` — core script  
 - `followers.json` — latest snapshot  
 - `log.json` — change history  
+
+---
+
+## ⚠️ Copyright Notice ⚠️
+© 2026 DRA3V50. All rights reserved.  
+This code is for demonstration and portfolio purposes only.  
+Unauthorized copying, redistribution, or commercial use is prohibited.
