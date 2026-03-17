@@ -38,4 +38,4 @@ jobs:
           git config user.email "DRA3V50@users.noreply.github.com"
           git add followers.json log.json
           git commit -m "Update follower logs [skip ci]" || echo "No changes to commit"
-          git push https://x-access-token:${{ secrets.Follow_Log }}@github.com/DRA3V50/Follow-Audit-Log.git HEAD:main
+          git push https://x-access-token:${{ secrets.GH_FOLLOW_TOKEN }}@github.com/DRA3V50/Follow-Audit-Log.git HEAD:main
