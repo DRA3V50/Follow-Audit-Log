@@ -2,9 +2,9 @@ name: Follow Audit Log
 
 on:
   schedule:
-    # Runs daily at 8 AM EST (13:00 UTC)
+    # Runs daily at 8 AM EST & 8 PM (13:00 UTC & 01:00 UTC)
     - cron: "0 13 * * *"
-    - cron: '0 1 * * *'    
+    - cron: "0 1 * * *"    
   workflow_dispatch:
 
 jobs:
