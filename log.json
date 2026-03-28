@@ -433,5 +433,16 @@
     "missing_follow_back": [
       "supervnova"
     ]
+  },
+  {
+    "timestamp": "2026-03-28T03:35:04.133952+00:00",
+    "new_followers": [
+      "gambling-addict"
+    ],
+    "unfollowed": [],
+    "missing_follow_back": [
+      "gambling-addict",
+      "supervnova"
+    ]
   }
 ]
