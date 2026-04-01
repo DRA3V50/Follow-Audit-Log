@@ -527,5 +527,16 @@
       "Rim-sha47",
       "supervnova"
     ]
+  },
+  {
+    "timestamp": "2026-04-01T04:10:50.558417+00:00",
+    "new_followers": [
+      "Isac999"
+    ],
+    "unfollowed": [],
+    "missing_follow_back": [
+      "Isac999",
+      "supervnova"
+    ]
   }
 ]
