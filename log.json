@@ -549,5 +549,15 @@
       "supervnova",
       "cyan0-3"
     ]
+  },
+  {
+    "timestamp": "2026-04-02T03:42:08.692395+00:00",
+    "new_followers": [
+      "YUEL4N"
+    ],
+    "unfollowed": [],
+    "missing_follow_back": [
+      "supervnova"
+    ]
   }
 ]
