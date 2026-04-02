@@ -559,5 +559,19 @@
     "missing_follow_back": [
       "supervnova"
     ]
+  },
+  {
+    "timestamp": "2026-04-02T14:15:01.160488+00:00",
+    "new_followers": [
+      "giladfuchs",
+      "Spark0914724",
+      "SHIYUT0"
+    ],
+    "unfollowed": [],
+    "missing_follow_back": [
+      "giladfuchs",
+      "supervnova",
+      "Spark0914724"
+    ]
   }
 ]
