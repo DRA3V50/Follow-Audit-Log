@@ -573,5 +573,18 @@
       "supervnova",
       "Spark0914724"
     ]
+  },
+  {
+    "timestamp": "2026-04-03T03:44:19.782009+00:00",
+    "new_followers": [
+      "metatronslove",
+      "nykoco"
+    ],
+    "unfollowed": [],
+    "missing_follow_back": [
+      "metatronslove",
+      "nykoco",
+      "supervnova"
+    ]
   }
 ]
