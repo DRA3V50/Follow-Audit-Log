@@ -682,5 +682,18 @@
       "sunny-days-365",
       "supervnova"
     ]
+  },
+  {
+    "timestamp": "2026-04-07T14:25:18.603608+00:00",
+    "new_followers": [
+      "diegofm09"
+    ],
+    "unfollowed": [
+      "SHIYUT0"
+    ],
+    "missing_follow_back": [
+      "diegofm09",
+      "supervnova"
+    ]
   }
 ]
