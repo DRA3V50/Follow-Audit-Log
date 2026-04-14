@@ -815,5 +815,19 @@
       "sphinxzerd",
       "supervnova"
     ]
+  },
+  {
+    "timestamp": "2026-04-14T04:08:44.009425+00:00",
+    "new_followers": [
+      "H4ckB4s3",
+      "yakeIore"
+    ],
+    "unfollowed": [],
+    "missing_follow_back": [
+      "H4ckB4s3",
+      "sphinxzerd",
+      "supervnova",
+      "yakeIore"
+    ]
   }
 ]
