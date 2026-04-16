@@ -856,5 +856,17 @@
       "sphinxzerd",
       "supervnova"
     ]
+  },
+  {
+    "timestamp": "2026-04-16T04:13:55.767028+00:00",
+    "new_followers": [
+      "ruidev0801"
+    ],
+    "unfollowed": [],
+    "missing_follow_back": [
+      "sphinxzerd",
+      "supervnova",
+      "ruidev0801"
+    ]
   }
 ]
