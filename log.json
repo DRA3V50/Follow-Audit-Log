@@ -936,5 +936,19 @@
       "sphinxzerd",
       "supervnova"
     ]
+  },
+  {
+    "timestamp": "2026-04-19T13:52:19.283012+00:00",
+    "new_followers": [
+      "giewan",
+      "anarchy-hime"
+    ],
+    "unfollowed": [],
+    "missing_follow_back": [
+      "giewan",
+      "sphinxzerd",
+      "supervnova",
+      "anarchy-hime"
+    ]
   }
 ]
