@@ -1083,5 +1083,18 @@
       "sphinxzerd",
       "supervnova"
     ]
+  },
+  {
+    "timestamp": "2026-04-25T03:50:50.066362+00:00",
+    "new_followers": [
+      "HexCore8",
+      "kagehero"
+    ],
+    "unfollowed": [],
+    "missing_follow_back": [
+      "kagehero",
+      "sphinxzerd",
+      "supervnova"
+    ]
   }
 ]
