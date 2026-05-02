@@ -1223,5 +1223,17 @@
       "sphinxzerd",
       "supervnova"
     ]
+  },
+  {
+    "timestamp": "2026-05-02T04:17:34.203054+00:00",
+    "new_followers": [
+      "DaFi-1"
+    ],
+    "unfollowed": [],
+    "missing_follow_back": [
+      "sphinxzerd",
+      "supervnova",
+      "DaFi-1"
+    ]
   }
 ]
