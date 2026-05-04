@@ -1262,5 +1262,19 @@
       "sphinxzerd",
       "supervnova"
     ]
+  },
+  {
+    "timestamp": "2026-05-04T04:39:00.181574+00:00",
+    "new_followers": [
+      "yakeIore"
+    ],
+    "unfollowed": [
+      "theBappy"
+    ],
+    "missing_follow_back": [
+      "sphinxzerd",
+      "supervnova",
+      "yakeIore"
+    ]
   }
 ]
